@@ -1,0 +1,10 @@
+{
+  "title": "Markets Briefing",
+  "published_at": "2026-03-20T06:00:00+00:00",
+  "section": "Finance",
+  "summary": "A fast look at the forces moving markets before the London open.",
+  "announcer_intro": "a brisk read of the numbers and politics steering the next trading day",
+  "interesting_score": 0.82,
+  "tags": ["markets", "daily"],
+  "source_url": "https://editorial.example.internal/markets-briefing"
+}

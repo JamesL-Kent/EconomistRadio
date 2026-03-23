@@ -1,0 +1,103 @@
+station:
+  # Public station identity used in host links and status output.
+  name: "Economist Radio"
+  timezone: "Europe/London"
+  scan_interval_seconds: 20
+
+content:
+  # Point this to the folder that receives your narrated features.
+  # Each audio file can have a sidecar JSON/YAML metadata file with the same stem.
+  root_path: ../content
+  audio_extensions: [".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac"]
+  metadata_extensions: [".json", ".yaml", ".yml"]
+
+scheduling:
+  # Fresh material is weighted hardest, but the scheduler will still inject
+  # weekly and evergreen archive pieces at controlled intervals.
+  repeat_cooldown_hours: 18
+  today_priority_weight: 6.0
+  week_priority_weight: 2.5
+  archive_priority_weight: 0.8
+  interesting_bonus: 1.2
+  evergreen_bonus: 0.5
+  history_penalty: 0.35
+  week_injection_interval: 4
+  archive_injection_interval: 8
+  minimum_archive_score: 0.65
+
+host:
+  # Personality configuration area.
+  name: "Adrienne"
+  identity: "A calm, sharp radio presenter who sounds concise and informed."
+  tone: "Warm, brisk, lightly witty, never over-explained."
+  max_link_words: 42
+  max_link_sentences: 2
+
+  # TTS backend:
+  # - polly: real spoken host links via AWS Polly
+  # - silence: local development fallback with short silent placeholders
+  #tts_backend: polly
+  tts_backend: silence
+
+  # Polly voice configuration.
+  voice_id: "Amy"
+  polly_engine: "neural"
+  silent_link_seconds: 1.2
+
+  # Template banks used to keep links short and on-brand.
+  opener_templates:
+    - "You're listening to {station_name}."
+    - "This is {station_name}, and I'm {host_name}."
+    - "Stay with us on {station_name}."
+  bridge_templates:
+    - "Next, {host_name} turns to {section}."
+    - "Now for a quick shift into {section}."
+    - "Coming up, a concise look at {section}."
+  teaser_templates:
+    - "{title}: {summary}."
+    - "It's {title}, with {summary}."
+    - "Ahead, {title} and {summary}."
+  banned_phrases:
+    - "in today's episode"
+    - "don't go anywhere"
+    - "after the break"
+
+runtime:
+  # Internal working state for the always-on process.
+  working_root: ../runtime
+  state_db_path: ../runtime/state/radio.db
+  scratch_root: ../runtime/scratch
+  synth_cache_root: ../runtime/synth-cache
+
+audio:
+  # ffmpeg/ffprobe must exist in the runtime image.
+  ffmpeg_binary: ffmpeg
+  ffprobe_binary: ffprobe
+  output_codec: aac
+  audio_bitrate: 128k
+  sample_rate_hz: 44100
+
+output:
+  # The app writes a rolling live playlist here and serves it at /stream.
+  root_path: ../runtime/output
+  public_mount_path: /stream
+  playlist_name: live.m3u8
+  segments_subdirectory: segments
+  segment_duration_seconds: 6
+  playlist_window_segments: 24
+  retention_segments: 48
+  target_buffer_seconds: 240
+  max_buffer_seconds: 420
+
+  # Optional public URL for status output.
+  # Example: https://radio.example.com
+  public_base_url:
+
+  # Optional S3 mirror for CloudFront or other AWS delivery.
+  s3_bucket:
+  s3_prefix: radio/live
+  aws_region: eu-west-2
+
+app:
+  host: 0.0.0.0
+  port: 8000
